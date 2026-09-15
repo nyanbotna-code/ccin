@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCIN(ｸｯｷﾝ)</title>
+<style>
+  /* CCIN 本体の画面から実測した配色
+     アクセント #D97757（送信 / OK ボタン）/ 地 #202020 / 本文欄 #1F1E1D
+     下段 #262624 / ボタン・入力欄 #30302E / 文字 #F0EEE6 / ヒント #8A857B */
+  :root{
+    --bg:#202020;        /* 窓の地 */
+    --body-dark:#1F1E1D; /* 本文エリア */
+    --card:#262624;      /* 下段の地 */
+    --card2:#30302E;     /* ボタン・入力欄・一覧 */
+    --line:#3C3C39;
+    --line-strong:#656561;
+    --fg:#F0EEE6;        /* 通常文字 */
+    --dim:#8A857B;       /* ヒント文字（薄い灰） */
+    --accent:#D97757;    /* オレンジ */
+    --accent-ink:#FFFFFF;
+    --accent-soft:rgba(217,119,87,.12);
+    --accent-line:rgba(217,119,87,.45);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font-family:"Yu Gothic UI","Yu Gothic",Meiryo,"Hiragino Kaku Gothic ProN",sans-serif;
+    font-size:15px; line-height:1.9;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:32px 20px 80px}
+
+  h1{
+    font-size:30px; line-height:1.4; margin:0 0 8px;
+    color:var(--fg); letter-spacing:.02em;
+  }
+  h1::before{
+    content:""; display:inline-block; width:10px; height:26px;
+    background:var(--accent); border-radius:2px;
+    margin-right:12px; vertical-align:-3px;
+  }
+  .rule{height:3px; border-radius:3px; background:linear-gradient(90deg,var(--accent),transparent); margin-bottom:28px}
+
+  nav{
+    background:var(--card2); border:1px solid var(--line); border-radius:8px;
+    padding:14px 18px; margin-bottom:32px;
+  }
+  nav ul{list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px 18px}
+  nav a{color:var(--dim); text-decoration:none; font-size:13.5px; border-bottom:1px dotted transparent}
+  nav a:hover{color:var(--accent); border-bottom-color:var(--accent)}
+
+  section{
+    background:var(--card); border:1px solid var(--line); border-left:5px solid var(--line-strong);
+    border-radius:8px; padding:20px 24px; margin:0 0 20px;
+  }
+  section > h2{
+    font-size:20px; margin:0 0 14px; padding-bottom:10px;
+    border-bottom:1px solid var(--line); color:var(--fg);
+  }
+  h3{
+    font-size:17px; margin:26px 0 14px; color:var(--accent);
+    padding-left:11px; border-left:3px solid var(--accent);
+  }
+  h3:first-of-type{margin-top:6px}
+  p{margin:0 0 12px}
+  section > p:last-child{margin-bottom:0}
+
+  /* 情報系 — 薄い灰の帯 */
+  .info{border-left-color:var(--line-strong)}
+  .info > h2{color:var(--fg)}
+
+  /* 使い方 — オレンジの帯 */
+  .howto{border-left-color:var(--accent)}
+  .howto > h2{color:var(--accent)}
+
+  /* 禁止 — オレンジを面で使い、地も一段起こす */
+  .danger{
+    border-left-color:var(--accent); border-left-width:7px;
+    background:linear-gradient(180deg,var(--accent-soft),var(--card) 160px);
+  }
+  .danger > h2{
+    color:var(--accent-ink); background:var(--accent);
+    margin:-20px -24px 16px; padding:12px 24px;
+    border-bottom:none; border-radius:0 6px 0 0;
+  }
+
+  /* 備忘録 — 薄い灰 */
+  .memo{border-left-color:var(--dim)}
+  .memo > h2{color:var(--dim)}
+
+  /* 項目リスト */
+  ol.items{list-style:none; margin:0; padding:0; counter-reset:none}
+  ol.items > li{
+    background:var(--card2); border:1px solid var(--line); border-radius:8px;
+    padding:12px 16px; margin:0 0 10px;
+  }
+  ol.items > li > .t{
+    display:block; font-weight:700; color:var(--accent); margin-bottom:4px; font-size:15.5px;
+  }
+  ol.items > li p{margin:0 0 6px}
+  ol.items > li p:last-child{margin-bottom:0}
+
+  /* 入れ子（画面2 のリスト内） */
+  ol.sub{list-style:none; margin:12px 0 0; padding:0 0 0 14px; border-left:2px solid var(--line)}
+  ol.sub > li{margin:0 0 10px; padding:0 0 0 10px}
+  ol.sub > li:last-child{margin-bottom:0}
+  ol.sub > li > .t{display:block; font-weight:700; color:var(--fg); margin-bottom:2px}
+
+  /* 番号付き禁止事項・備忘録 */
+  ol.plain{list-style:none; margin:0; padding:0}
+  ol.plain > li{
+    background:rgba(0,0,0,.22); border:1px solid var(--line); border-radius:8px;
+    padding:14px 18px; margin:0 0 12px;
+  }
+  ol.plain > li:last-child{margin-bottom:0}
+  ol.plain > li p{margin:0 0 6px}
+  ol.plain > li p:last-child{margin-bottom:0}
+  .danger ol.plain > li{border-left:3px solid var(--accent); background:rgba(0,0,0,.3)}
+  .memo ol.plain > li{border-left:3px solid var(--dim)}
+
+  /* ★★注意★★ */
+  .caution{
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:6px;
+    padding:12px 16px; margin:12px 0 0;
+  }
+  .caution .mark{display:block; font-weight:700; color:var(--accent); letter-spacing:.08em; margin-bottom:6px}
+  .caution p{margin:0 0 6px}
+  .caution p:last-child{margin-bottom:0}
+
+  /* ショートカット */
+  .keys p{
+    font-family:Consolas,"Courier New",monospace; font-size:14.5px;
+    background:var(--body-dark); border:1px solid var(--line-strong);
+    border-radius:4px; padding:5px 12px; margin:0 0 5px;
+    color:var(--fg); display:inline-block; min-width:min(100%,260px);
+  }
+  .keys p:last-child{margin-bottom:0}
+
+  /* スクリーンショット */
+  .shot{margin:0 0 16px}
+  .shot img{
+    display:block; max-width:100%; height:auto;
+    border:1px solid var(--line); border-radius:8px;
+    background:#000; box-shadow:0 4px 18px rgba(0,0,0,.45);
+  }
+
+  code{
+    font-family:Consolas,"Courier New",monospace; font-size:.94em;
+    background:var(--body-dark); color:var(--accent);
+    border:1px solid var(--line);
+    padding:2px 6px; border-radius:4px; word-break:break-all;
+  }
+  .nya{text-align:right; color:var(--dim); font-size:18px; margin:28px 0 0}
+
+  @media (max-width:560px){
+    .wrap{padding:22px 14px 60px}
+    h1{font-size:24px}
+    section{padding:16px 15px}
+    .keys p{min-width:100%}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>CCIN(ｸｯｷﾝ)</h1>
+  <div class="rule"></div>
+
+  <nav aria-label="もくじ">
+    <ul>
+      <li><a href="#s1">Toolの概要</a></li>
+      <li><a href="#s2">動作環境</a></li>
+      <li><a href="#s3">導入方法</a></li>
+      <li><a href="#s4">アンインストール方法</a></li>
+      <li><a href="#s5">使い方</a></li>
+      <li><a href="#s6">★★やってはいけない操作★★</a></li>
+      <li><a href="#s7">ツールの挙動の備忘録</a></li>
+      <li><a href="#s8">⚠️免責事項（注意事項）</a></li>
+    </ul>
+  </nav>
+
+  <section class="info" id="s1">
+    <h2>Toolの概要</h2>
+    <p>Windows Terminalから起動されたClaude Codeに送る文章を、じっくり書いてから送るための入力エディタにゃ。</p>
+    <div class="caution">
+      <span class="mark">★★注意★★</span>
+      <p>使い方を読まずに使用すると誤動作による大損害が起きる危険があります。最後までしっかり読んでから、ご利用ください。</p>
+    </div>
+  </section>
+
+  <section class="info" id="s2">
+    <h2>動作環境</h2>
+    <p>Windows 10 / 11（64bit）＋ Windows Terminal ＋ Claude Code</p>
+  </section>
+
+  <section class="info" id="s3">
+    <h2>導入方法</h2>
+    <p>ZIP を好きなフォルダに展開し <code>ccin.exe</code> を実行にゃ。</p>
+    <p>インストーラは無いにゃ。</p>
+  </section>
+
+  <section class="info" id="s4">
+    <h2>アンインストール方法</h2>
+    <p>フォルダごと削除してにゃ。</p>
+    <p>設定は <code>%LocalAppData%\ccin\</code> に残るので、完全に消すならそこも消してにゃ。</p>
+  </section>
+
+  <section class="howto" id="s5">
+    <h2>使い方</h2>
+
+    <h3>起動方法</h3>
+    <p>Zipファイルを解凍してccin.exeをダブルクリックして起動しますにゃ。</p>
+
+    <h3>画面1. Claude Code入力エディタウィンドウ</h3>
+    <p class="shot"><img src="screen1_main.png" alt="画面1. Claude Code入力エディタウィンドウ"></p>
+    <ol class="items">
+      <li>
+        <span class="t">1. テキスト入力エリア</span>
+        <p>ここに、Claude Codeに送る文章を書きます。改行を使用できますにゃ。</p>
+      </li>
+      <li>
+        <span class="t">2. ドロップダウンリスト</span>
+        <p>起動中のTerminalが表示されますにゃ。</p>
+      </li>
+      <li>
+        <span class="t">3. 送信ボタン</span>
+        <p>【テキスト入力エリア】に入力されたテキストを、</p>
+        <p>【クリップボード】にコピーし、【ドロップダウンリスト】で選択されたウィンドウに送信しますにゃ。</p>
+      </li>
+      <li>
+        <span class="t">4. リスト更新ボタン</span>
+        <p>起動中のTerminalを確認し【ドロップダウンリスト】を最新にしますにゃ。</p>
+      </li>
+      <li>
+        <span class="t">5. 最前面化ボタン</span>
+        <p>【ドロップダウンリスト】で選択されたウィンドウを最前面に持っていきますにゃ。</p>
+      </li>
+      <li>
+        <span class="t">6. 画像ボタン</span>
+        <p>Win+Shift+S+範囲選択にてキャプチャし、【画像】ボタンを押すと、</p>
+        <p>クリップボードに保存されいるスクショを【画像の保存先】で指定されたフォルダに【日時.png】で保存し、</p>
+        <p>【テキスト入力エリア】の一番下の行にフルパスをテキストで入力しますにゃ。</p>
+      </li>
+      <li>
+        <span class="t">7. Editボタン</span>
+        <p>【画面2. 送信先の編集ウィンドウ】を開きますにゃ。詳細は次の項目にて。</p>
+      </li>
+      <li>
+        <span class="t">8. To Activeチェックボタン</span>
+        <p>【ドロップダウンリスト】を無効化し操作できなくなります。</p>
+        <p>代わりに2秒ポーリングにて画面を監視し、【ドロップダウンリスト】を更新しますにゃ。</p>
+        <p>そして、現在ActiveになっているClaude Codeを自動でドロップダウンリスト選択状態にし、【送信】できるようにしますにゃ。</p>
+        <div class="caution">
+          <span class="mark">★★注意★★</span>
+          <p>2秒ポーリングのため、「ウィンドウを選択 → 送信」を2秒未満でやると、意図しないウィンドウに送られる可能性があります。</p>
+          <p>【送信】する場合は、かならず【ドロップダウンリスト】に送りたいウィンドウが選択状態にあることを目視確認してください。にゃ。</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">9. ショートカット</span>
+        <div class="keys">
+          <p>Ctrl+Enter:送信</p>
+          <p>Ctrl+数字:Claude Codeウィドウ切り替え</p>
+          <p>F5:リスト更新</p>
+          <p>Ctrl+T:最前面化ON,OFF</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">10.ステータス表示</span>
+        <p>CCINの状態を表示します。エラーなどがあればここに表示します。にゃ。</p>
+      </li>
+    </ol>
+
+    <h3>画面2. 送信先の編集ウィンドウ</h3>
+    <p class="shot"><img src="screen2_edit.png" alt="画面2. 送信先の編集ウィンドウ"></p>
+    <ol class="items">
+      <li>
+        <span class="t">1. リスト 【ドロップダウンリスト】に表示する現在開いているウィンドウの一覧です。にゃ。</span>
+        <ol class="sub">
+          <li>
+            <span class="t">1. No</span>
+            <p>開いた順番に番号が振られます。ウィンドウが閉じられ欠番すると、新しくウィンドウが開かれたときに空いてる番号入ります。にゃ。</p>
+          </li>
+          <li>
+            <span class="t">2. 表示名</span>
+            <p>【ドロップダウンリスト】に表示させる名前を自分で決めることができます。にゃ。</p>
+          </li>
+          <li>
+            <span class="t">3. 実タブ名</span>
+            <p>【ドロップダウンリスト】で表示するウィンドウにつけられた名前を表示します。にゃ。</p>
+          </li>
+          <li>
+            <span class="t">4. 表示</span>
+            <p>【ドロップダウンリスト】に表示する・しないを切り替えられます。にゃ。</p>
+          </li>
+          <li>
+            <span class="t">5. ログ</span>
+            <p>【送信】を実行すると、送ったプロンプトの履歴をここで指定した名前のログファイルに保存されます。にゃ。</p>
+            <p>ログファイル名はCCIN起動時に決まります。起動時の【日時_枝番.log】になります。変更することも可能です。にゃ。</p>
+          </li>
+          <li>
+            <span class="t">6. ...</span>
+            <p>ログファイルを直接開きたいときに押します。ない場合は開けません。にゃ。</p>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <span class="t">2. ▲ ▼</span>
+        <p>【リスト】の順を変更することができます。変更すると【ドロップダウンリスト】に表示される順番が変わります。にゃ。</p>
+      </li>
+      <li>
+        <span class="t">3. 番号を詰める</span>
+        <p>Tarminalを開いたり閉じたりを繰り返すと、【No】に欠番がでたりするので、空いてる番号を詰めることができます。にゃ。</p>
+      </li>
+      <li>
+        <span class="t">4. 表示名を消す</span>
+        <p>自分で設定した表示名を消して、【ドロップダウンリスト】に【実タブ名】を表示することができます。にゃ。</p>
+      </li>
+      <li>
+        <span class="t">5. 非アクティブ時に半透明</span>
+        <p>CCINのウィンドウを非アクティブ時に半透明化することができます。常に最前面にした時に便利です。にゃ。</p>
+      </li>
+      <li>
+        <span class="t">6. 常に最前面</span>
+        <p>CCINを常に最前面にします。にゃ。</p>
+      </li>
+      <li>
+        <span class="t">7. 貼った画像を開く</span>
+        <p>メインウィンドウにて【画像】ボタンを使用し、クリップボードから作成された画像のプレビューの表示する・しないを切り替えることができます。にゃ。</p>
+      </li>
+      <li>
+        <span class="t">8. 画像の保存先</span>
+        <p>【画像】ボタンを押したときの画像の保存先を指定します。にゃ。</p>
+      </li>
+      <li>
+        <span class="t">9.ログの保存先</span>
+        <p>ログの保存先を指定します。にゃ。</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="danger" id="s6">
+    <h2>★★やってはいけない操作★★</h2>
+    <ol class="plain">
+      <li>
+        <p>1. 本ツールは、CCINに入力されたテキストはクリップボードを経由し、ウィンドウに張り付けられます。</p>
+        <p>【送信】ボタンを押したら、「テキストがClaude Codeに送信されるのを確認するまで、画面操作を行わないでください。」</p>
+        <p>また、CCINを外部ツールなどから自動入力もしないでください。</p>
+        <p>クリップボードが混線し、意図しないプロンプトを別のウィンドウに張り付けたりすることになります。</p>
+      </li>
+      <li>
+        <p>2. 【To Activeチェックボタン】にも書きましたが、2秒ポーリングのため、</p>
+        <p>「ウィンドウを選択 → 送信」を2秒未満でやると、意図しないウィンドウに送られる可能性があります。</p>
+        <p>送信する場合は、かならず【ドロップダウンリスト】に送りたいウィンドウが選択状態にあることを「目視確認」してください。</p>
+      </li>
+      <li>
+        <p>3. Windows Terminalの素シェルなども【ドロップダウンリスト】に認識されます。(VS Code や Cursorの内臓ターミナルは対象外)</p>
+        <p>Claude Codeなどが起動されていない素のWindows Terminalなどは複数行入力に対応していません。</p>
+        <p>複数行を送ろうとすると意図しない動きになります。送らないでください。【Editボタン】から【表示】のチェックを外してください。</p>
+      </li>
+      <li>
+        <p>4. Claude Codeで上下キーで選択を求められているときに、テキストを【送信】すると、Enterだけが認識され、その選択を確定したということになります。</p>
+        <p>画面を確認し、「テキスト入力待機状態」にあることを目視確認してから【送信】してください。</p>
+      </li>
+    </ol>
+  </section>
+  <p class="nya">にゃ。</p>
+  
+  <section class="memo" id="s7">
+    <h2>ツールの挙動の備忘録</h2>
+    <ol class="plain">
+      <li>
+        <p>1. 再起動すると、表示名・番号・Editの内容はリセットされます。</p>
+        <p>誤認識を避けるため、記憶する機能を付ける予定はありません。</p>
+      </li>
+      <li>
+        <p>2. CCINのメインウィンドウのサイズ、表示位置やEditウィンドウから設定できるCCIN本体に関する設定のみ保存されます。</p>
+        <p>ターミナルの情報に関するものは保存されません。</p>
+        </li>
+      <li>
+        <p>3. ほかの仮想デスクトップで開いているターミナルには送れません。</p>
+      </li>
+      <li>
+        <p>4. 送信ログは送った本文がそのまま残ります。秘密を含む文章を送ったら、ログも同じ扱いにしてください。</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="danger" id="s8">
+    <h2>⚠️免責事項（注意事項）</h2>
+    <p>本プロジェクトは個人の趣味および研究用として開発されたプロトタイプです。</p>
+    <p>CCINは【送信】のたびに、選んだウィンドウへ文字を貼り付けて Enter を打ちます。
+      送り先を取り違えると、別のClaude Codeが無関係な指示で動き出し、
+      そのプロジェクトのファイルが書き換わったり、トークンを大量に消費したりします。
+      素のターミナルに送った場合は、本文がそのままコマンドとして実行されます。</p>
+    <p>個別PC環境での起動サポート、セットアップに関する質問回答、エラー対応等は一切致しません。
+      本ツールの使用によって生じたいかなる損害についても、作者は一切の責任を負いかねます。</p>
+  </section>
+
+  <p class="nya">にゃ。</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>ccin</AssemblyName>
+    <RootNamespace>Ccin</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- 版はここだけに書く。画面のタイトルも実行ファイルのプロパティもこの値を使う。
+         差し替えたのにどの版が動いているか分からない、という事態を避けるため -->
+    <Version>1.0.6</Version>
+
+    <UseWindowsForms>true</UseWindowsForms>
+
+    <!-- System.Windows.Automation (UI Automation) ships with the WPF stack.
+         It is the only way to enumerate and select Windows Terminal tabs. -->
+    <UseWPF>true</UseWPF>
+
+    <!-- 実行ファイルとタスクバーのアイコン。Form.Icon を書かなくても、
+         WinForms がここで指定したものを窓のアイコンとして使う。
+         絵柄を変えるときは ccin/icon/ を編集して ccin/tools/make-icon で作り直す -->
+    <ApplicationIcon>ccin.ico</ApplicationIcon>
+
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationUseCompatibleTextRendering>false</ApplicationUseCompatibleTextRendering>
+    <ApplicationDefaultFont>Yu Gothic UI, 9pt</ApplicationDefaultFont>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 同じ ico を埋め込みでも持つ。ApplicationIcon は実行ファイルの見た目を変えるだけで、
+         窓のアイコンには使われないため（AppIcon.cs 参照） -->
+    <EmbeddedResource Include="ccin.ico" LogicalName="ccin.ico" />
+  </ItemGroup>
+
+</Project>
